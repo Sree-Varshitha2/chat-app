@@ -10,7 +10,7 @@ function App() {
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8080");
+    ws.current = new WebSocket("wss://your-backend.onrender.com");
 
     ws.current.onmessage = (event) => {
       const data = JSON.parse(event.data);
