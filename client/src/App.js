@@ -1,91 +1,87 @@
-import { useEffect, useRef, useState } from "react";
-import "./App.css";
+import React, { useEffect, useRef, useState } from "react";
 
 function App() {
-  const [username, setUsername] = useState("");
-  const [nameSubmitted, setNameSubmitted] = useState(false);
-
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const ws = useRef(null);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    // ✅ IMPORTANT: use your backend URL
-    ws.current = new WebSocket("wss://chatapp16.onrender.com");
+    // 🔌 Connect to backend
+    socketRef.current = new WebSocket("wss://chatapp12.onrender.com");
 
-    ws.current.onopen = () => {
+    socketRef.current.onopen = () => {
       console.log("✅ Connected to server");
     };
 
-    ws.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        setMessages((prev) => [...prev, data]);
-      } catch (err) {
-        console.error("Error parsing message:", err);
-      }
+    socketRef.current.onmessage = (event) => {
+      console.log("📩 Received:", event.data);
+
+      // 🔥 Add message to UI
+      setMessages((prev) => [...prev, event.data]);
     };
 
-    ws.current.onerror = (err) => {
-      console.error("WebSocket error:", err);
+    socketRef.current.onerror = (error) => {
+      console.error("❌ WebSocket error:", error);
     };
 
-    return () => ws.current.close();
+    socketRef.current.onclose = () => {
+      console.log("🔌 Disconnected");
+    };
+
+    return () => {
+      socketRef.current.close();
+    };
   }, []);
 
+  // 📤 Send message
   const sendMessage = () => {
-    if (input.trim()) {
-      const msg = {
-        user: username,
-        text: input,
-      };
-
-      ws.current.send(JSON.stringify(msg));
+    if (input.trim() !== "") {
+      socketRef.current.send(input);
       setInput("");
     }
   };
 
-  // LOGIN SCREEN
-  if (!nameSubmitted) {
-    return (
-      <div className="login">
-        <h2>Enter Username</h2>
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder="Your name"
-        />
-        <button onClick={() => username && setNameSubmitted(true)}>
-          Join Chat
-        </button>
-      </div>
-    );
-  }
-
-  // CHAT SCREEN
   return (
-    <div className="container">
+    <div style={{ padding: "20px", fontFamily: "Arial" }}>
       <h2>Real-Time Chat</h2>
 
-      <div className="chat-box">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`msg ${msg.user === username ? "right" : "left"}`}
-          >
-            <b>{msg.user}</b>: {msg.text}
-          </div>
-        ))}
+      {/* 💬 Chat box */}
+      <div
+        style={{
+          border: "1px solid #ccc",
+          height: "300px",
+          overflowY: "auto",
+          marginBottom: "10px",
+          padding: "10px",
+        }}
+      >
+        {messages.length === 0 ? (
+          <p>No messages yet</p>
+        ) : (
+          messages.map((msg, index) => (
+            <div key={index} style={{ marginBottom: "5px" }}>
+              {msg}
+            </div>
+          ))
+        )}
       </div>
 
-      <div className="input-box">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type message..."
-        />
-        <button onClick={sendMessage}>Send</button>
-      </div>
+      {/* ✍️ Input */}
+      <input
+        type="text"
+        placeholder="Type message..."
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        style={{ width: "80%", padding: "8px" }}
+      />
+
+      {/* 📤 Send button */}
+      <button
+        onClick={sendMessage}
+        style={{ padding: "8px 12px", marginLeft: "10px" }}
+      >
+        Send
+      </button>
     </div>
   );
 }
