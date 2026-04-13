@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     // ✅ IMPORTANT: use your backend URL
-    ws.current = new WebSocket("wss://chatapp12.onrender.com");
+    ws.current = new WebSocket("wss://chatapp16.onrender.com");
 
     ws.current.onopen = () => {
       console.log("✅ Connected to server");
