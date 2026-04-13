@@ -10,11 +10,24 @@ function App() {
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("wss://your-backend.onrender.com");
+    // ✅ IMPORTANT: use your backend URL
+    ws.current = new WebSocket("wss://chatapp12.onrender.com");
+
+    ws.current.onopen = () => {
+      console.log("✅ Connected to server");
+    };
 
     ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setMessages((prev) => [...prev, data]);
+      try {
+        const data = JSON.parse(event.data);
+        setMessages((prev) => [...prev, data]);
+      } catch (err) {
+        console.error("Error parsing message:", err);
+      }
+    };
+
+    ws.current.onerror = (err) => {
+      console.error("WebSocket error:", err);
     };
 
     return () => ws.current.close();
