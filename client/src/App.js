@@ -6,7 +6,7 @@ function App() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = new WebSocket("wss://chatapp15.onrender.com");
+    socketRef.current = new WebSocket("wss://chatapp16.onrender.com");
 
     socketRef.current.onopen = () => {
       console.log("Connected");
