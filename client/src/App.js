@@ -6,23 +6,22 @@ function App() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = new WebSocket("wss://chatapp19.onrender.com");
+    socketRef.current = new WebSocket("wss://chatapp12.onrender.com");
 
     socketRef.current.onopen = () => {
       console.log("Connected");
     };
 
     socketRef.current.onmessage = (event) => {
+      console.log("Received:", event.data);
       setMessages((prev) => [...prev, event.data]);
     };
 
-    socketRef.current.onerror = (err) => {
-      console.log("Error:", err);
+    socketRef.current.onerror = (e) => {
+      console.log("Error:", e);
     };
 
-    return () => {
-      socketRef.current.close();
-    };
+    return () => socketRef.current.close();
   }, []);
 
   const sendMessage = () => {
@@ -33,18 +32,10 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: 20 }}>
       <h2>Real-Time Chat</h2>
 
-      <div
-        style={{
-          border: "1px solid black",
-          height: "300px",
-          overflowY: "auto",
-          marginBottom: "10px",
-          padding: "10px",
-        }}
-      >
+      <div style={{ border: "1px solid gray", height: 300, overflowY: "auto" }}>
         {messages.map((msg, i) => (
           <div key={i}>{msg}</div>
         ))}
